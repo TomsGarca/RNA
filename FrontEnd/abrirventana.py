@@ -11,31 +11,31 @@ window = Tk()
 # set window title
 window.title("Jackie The Ripper")
 # set window width and height
-window.configure(width=720, height=480)
+window.configure(width=720, height=600)
 # set window background color
 window.configure(bg='lightgray')
 
 
 # Create a photoimage object of the image in the path
-imagen1 = Image.open("fire_0003.jpg")
+imagen1 = Image.open("FrontEnd/fire_0003.jpg")
 test = ImageTk.PhotoImage(imagen1)
 
 label1 = tkinter.Label(image=test)
 label1.image = test
 
-imagen2 = Image.open("fire_0003.jpg")
+imagen2 = Image.open("FrontEnd/fire_0003.jpg")
 test2 = ImageTk.PhotoImage(imagen2)
 
 label2 = tkinter.Label(image=test2)
 label2.image = test2
 
-imagen3 = Image.open("fire_0003.jpg")
+imagen3 = Image.open("FrontEnd/fire_0003.jpg")
 test3 = ImageTk.PhotoImage(imagen3)
 
 label3 = tkinter.Label(image=test3)
 label3.image = test3
 
-imagen4 = Image.open("fire_0003.jpg")
+imagen4 = Image.open("FrontEnd/fire_0003.jpg")
 test4 = ImageTk.PhotoImage(imagen4)
 
 label4 = tkinter.Label(image=test4)
@@ -57,5 +57,5 @@ window.mainloop()
 
 # FUNCION QUE MUESTRE LA IMAGEN EN PEQUEÑAS IMAGENES (TIPO CUADRICULA COMO LAS DE LOS CAPTCHAS) 
 def jackTheRipper():
-    imagen = PhotoImage(file="fire_0002.jpg")
+    imagen = PhotoImage(file="FrontEnd/fire_0002.jpg")
     
