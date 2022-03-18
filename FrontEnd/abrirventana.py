@@ -30,29 +30,6 @@ window.configure(bg='lightgray')
 
 file = "fire_0003"
 archv = "FrontEnd/" + file + ".jpg"
-# Create a photoimage object of the image in the path
-# imagen1 = Image.open(archv)
-# test = ImageTk.PhotoImage(imagen1)
-# label1 = tkinter.Label(image=test)
-
-# imagen2 = Image.open(archv)
-# test2 = ImageTk.PhotoImage(imagen2)
-# label2 = tkinter.Label(image=test2)
-
-# imagen3 = Image.open(archv)
-# test3 = ImageTk.PhotoImage(imagen3)
-# label3 = tkinter.Label(image=test3)
-
-# imagen4 = Image.open(archv)
-# test4 = ImageTk.PhotoImage(imagen4)
-# label4 = tkinter.Label(image=test4)
-#label4.image = test4
-
-# Position image
-# label1.place(x=100, y=75)
-# label2.place(x=400, y=75)
-# label3.place(x=100, y=275)
-# label4.place(x=400, y=275)
 
 #Definimos el boton de siguiente
 boton = ttk.Button(text="Siguiente")
