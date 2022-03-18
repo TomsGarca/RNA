@@ -15,8 +15,32 @@ import tempfile
 # FUNCION QUE MUESTRE LA IMAGEN EN PEQUEÑAS IMAGENES (TIPO CUADRICULA COMO LAS DE LOS CAPTCHAS) 
 # def jackTheRipper():
 #     imagen = PhotoImage(file="FrontEnd/fire_0002.jpg")
-################FUNCIONES################
+def cutPic(tmp, tiles, file):
+    c1 = 1
+    c2 = 1
+    x = 75
+    y = 75
+    label = []
+    for i in range(1, len(tiles)+1):
+        arch = tmp + "/" + file + "_0" + str(c1) + "_0" + str(c2) + ".png"
+        img = Image.open(arch)
+        pic = ImageTk.PhotoImage(img)
+        label.append(tkinter.Label(image=pic))
+        label[i-1].image = pic
 
+        if c2 < 5:
+            c2 += 1
+        else:
+            c1 += 1
+            c2 = 1
+
+        label[i-1].place(x=x, y=y)
+        if i%5 == 0:
+            x = 75
+            y += 55
+        else:
+            x += 55
+################FUNCIONES################
 
 ################Declare the Window#####################
 window = Tk()
@@ -41,36 +65,9 @@ texto.place(x=30,y=20)
 
 tiles = image_slicer.slice(archv, 25, save=False)
 # image_slicer.save_tiles(tiles, directory="FrontEnd/tmp", prefix=file)
+
+
 with tempfile.TemporaryDirectory(dir="FrontEnd") as tmp:
     image_slicer.save_tiles(tiles, directory=tmp, prefix=file)
-    c1 = 1
-    c2 = 1
-    x = 75
-    y = 75
-    label = []
-    for i in range(1, len(tiles)+1):
-        arch = tmp + "/" + file + "_0" + str(c1) + "_0" + str(c2) + ".png"
-        img = Image.open(arch)
-        pic = ImageTk.PhotoImage(img)
-        label.append(tkinter.Label(image=pic))
-        label[i-1].image = pic
-        
-        if c2 < 5:
-            c2 += 1
-        else:
-            c1 += 1
-            c2 = 1
-        
-        label[i-1].place(x=x, y=y)
-        if i%5 == 0:
-            x = 75
-            y += 55
-        else:
-            x += 55
+    cutPic(tmp=tmp, tiles=tiles, file=file)
     window.mainloop()
-#Mantiene a la ventana abierta
-# window.mainloop()
-
-
-# tiles = image_slicer.slice(archv, 4, save=False)
-# # image_slicer.save_tiles(tiles, directory="FrontEnd/tmp", prefix=file)
