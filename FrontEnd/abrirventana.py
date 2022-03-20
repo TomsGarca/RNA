@@ -10,7 +10,7 @@ import tempfile
 
 ################FUNCIONES################
 # FUNCION QUE MUESTRE LA IMAGEN EN PEQUEÑAS IMAGENES (TIPO CUADRICULA COMO LAS DE LOS CAPTCHAS) 
-def cutPic(tmp, tiles, file):
+def jackTheRipper(tmp, tiles, file):
     #tmp = carpeta donde se guadan las imagenes.
     #tiles = variable que contiene la imagen fragmentada.
     #file = nombre del archivo original, sin extension.
@@ -88,6 +88,6 @@ tiles = image_slicer.slice(archv, 25, save=False)
 with tempfile.TemporaryDirectory(dir="FrontEnd") as tmp:
     # Fragmentos de imagen guardados en la carpeta tmp
     image_slicer.save_tiles(tiles, directory=tmp, prefix=file)
-    cutPic(tmp=tmp, tiles=tiles, file=file)
+    jackTheRipper(tmp=tmp, tiles=tiles, file=file)
     #Ventana de Vizualizacion.
     window.mainloop()
