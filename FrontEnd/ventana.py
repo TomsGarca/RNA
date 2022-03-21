@@ -1,11 +1,17 @@
 ################LIBRERIAS################
+from msilib.schema import EventMapping
 import tkinter
 from tkinter import *
 from tkinter import ttk
+from turtle import bgcolor
 from PIL import Image, ImageTk
+from black import nullcontext
 import image_slicer
 import tempfile
+
+from numpy import place
 ################LIBRERIAS################
+
 file = "fire_0004"
 archv = "FrontEnd/" + file + ".jpg"
 tiles = image_slicer.slice(archv, 25, save=False)
@@ -13,18 +19,28 @@ tiles = image_slicer.slice(archv, 25, save=False)
 class App():
     def __init__(self):
 
-        ################Declare the Window#####################
         window = Tk()
-        window.geometry('720x500')
+        ################Declare the Window#####################
+        window.geometry('720x360')
         window.title("Jackie The Ripper")
         window.config(bg="lightgray")
         ################Declare the Window#####################
 
         #Definimos el boton de siguiente
+
+        # style = ttk.Style()
+        # style.configure("Green", foreground="white", background="green")
+
         ttk.Button(window, text='Siguiente').place(x=600, y=20)
+        ttk.Button(window, text='Inciendo').place(x=600, y=70)
+        ttk.Button(window, text='No Incendio').place(x=600, y=100)
+        ttk.Button(window, text='Humo').place(x=600, y=130)
 
         #Label para mostrar el nombre del archivo
-        ttk.Label(window, text="archivo").place(x=30,y=20)
+        ttk.Label(window, text="archivo").place(x=30, y=20)
+        # ttk.Label(window, text="-------", style="Green").place(x=550, y=70)
+        # ttk.Label(window, text="-------").place(x=550, y=100)
+        # ttk.Label(window, text="-------").place(x=550, y=130)
 
         self.tmpfolder(tiles=tiles, file=file, window=window)
 
@@ -51,8 +67,14 @@ class App():
         cmp = cmp2 = comp = ""
         label = []  # Arreglo de objetos label(img).
 
-        for i in range(1, len(tiles)+1):
+        def clicked(label):
+            def click(event):
+                label.config(bg="purple")
+            return click
+            #print(1)
 
+        for i in range(1, len(tiles)+1):
+ 
             #Numero de Iteracion en el fragmento
             if c1 < 10:
                 cmp = "_0" + str(c1)
@@ -72,10 +94,10 @@ class App():
             img = Image.open(arch)
             pic = ImageTk.PhotoImage(img)
             #label.append(tkinter.Label(window, image=pic))
-            label.append(tkinter.Label(window, image=pic, borderwidth=4, relief="groove"))
+            label.append(tkinter.Label(window, image=pic, borderwidth=4))
             label[i-1].image = pic
             
-            #label[i-1].bind("<Button-1>", clicked)
+            label[i-1].bind("<Button-1>", clicked(label=label[i-1]))
             #label[i-1].config(bg="green") #Cambia Color el borde
 
             #Crecion de matriz para vizualizacion (5x5)
@@ -96,3 +118,4 @@ class App():
 ########### MAIN ############
 if __name__ == '__main__':
     App()
+########### MAIN ############
