@@ -10,10 +10,10 @@ import tempfile
 
 ################FUNCIONES################
 # FUNCION QUE MUESTRE LA IMAGEN EN PEQUEÑAS IMAGENES (TIPO CUADRICULA COMO LAS DE LOS CAPTCHAS) 
-def jackTheRipper(tmp, tiles, file):
-    #tmp = carpeta donde se guadan las imagenes.
-    #tiles = variable que contiene la imagen fragmentada.
-    #file = nombre del archivo original, sin extension.
+def jackTheRipper(tmp:str, tiles:list, file:str):
+    """tmp = carpeta donde se guadan las imagenes.\n
+    tiles = variable que contiene la imagen fragmentada.\n
+    file = nombre del archivo original, sin extension."""
 
     #Inicializacion de Variables para iraciones.
     c1 = c2 = 1
