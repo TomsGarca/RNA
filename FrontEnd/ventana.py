@@ -1,15 +1,10 @@
 ################LIBRERIAS################
-from msilib.schema import EventMapping
 import tkinter
 from tkinter import *
 from tkinter import ttk
-from turtle import bgcolor
 from PIL import Image, ImageTk
-from black import nullcontext
 import image_slicer
 import tempfile
-
-from numpy import place
 ################LIBRERIAS################
 
 file = "fire_0004"
@@ -18,26 +13,45 @@ tiles = image_slicer.slice(archv, 25, save=False)
 
 class App():
     def __init__(self):
+        mediar = mediag = mediab = []
+        media = {
+            "R": mediar,
+            "G": mediag,
+            "B": mediab
+        }
+        # global colores
+        # colores = "none"
 
-        window = Tk()
         ################Declare the Window#####################
+        window = Tk()
         window.geometry('720x360')
         window.title("Jackie The Ripper")
         window.config(bg="lightgray")
         ################Declare the Window#####################
 
+        def colorpick(c):
+            "Colores a elegir para seleccion de imagen"
+            def click (event):
+                global colores
+                colores = c
+                print (colores)
+            return click
+
         #Definimos el boton de siguiente
-
-        # style = ttk.Style()
-        # style.configure("Green", foreground="white", background="green")
-
-        ttk.Button(window, text='Siguiente').place(x=600, y=20)
-        ttk.Button(window, text='Inciendo').place(x=600, y=70)
-        ttk.Button(window, text='No Incendio').place(x=600, y=100)
-        ttk.Button(window, text='Humo').place(x=600, y=130)
+        siguiente_btn = ttk.Button(window, text='Siguiente')
+        siguiente_btn.place(x=600, y=20)
+        incendio_btn = ttk.Button(window, text='Inciendo')
+        incendio_btn.place(x=600, y=70)
+        incendio_btn.bind("<Button-1>", colorpick("orange"))
+        noincendio_btn = ttk.Button(window, text='No Incendio')
+        noincendio_btn.place(x=600, y=100)
+        noincendio_btn.bind("<Button-1>", colorpick("green"))
+        humo_btn = ttk.Button(window, text='Humo')
+        humo_btn.place(x=600, y=130)
+        humo_btn.bind("<Button-1>", colorpick("blue"))
 
         #Label para mostrar el nombre del archivo
-        ttk.Label(window, text="archivo").place(x=30, y=20)
+        ttk.Label(window, text=archv).place(x=30, y=20)
         # ttk.Label(window, text="-------", style="Green").place(x=550, y=70)
         # ttk.Label(window, text="-------").place(x=550, y=100)
         # ttk.Label(window, text="-------").place(x=550, y=130)
@@ -46,11 +60,11 @@ class App():
 
         #Ventana Loopeada.
         window.mainloop()
-
     # Creacion de Carpeta Temporal
     def tmpfolder(self, tiles:list, file:str, window:Tk):
         with tempfile.TemporaryDirectory(dir="FrontEnd") as tmp:
             # Fragmentos de imagen guardados en la carpeta tmp
+            #print(tmp)
             image_slicer.save_tiles(tiles, directory=tmp, prefix=file)
             self.jackTheRipper(tmp=tmp, tiles=tiles, file=file, window=window)
 
@@ -69,7 +83,7 @@ class App():
 
         def clicked(label):
             def click(event):
-                label.config(bg="purple")
+                label.config(bg=(colores))
             return click
             #print(1)
 
