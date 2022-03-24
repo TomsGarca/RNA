@@ -7,7 +7,7 @@ import image_slicer
 import tempfile
 
 from pprint import pprint
-from matplotlib.pyplot import text
+
 import numpy as np
 from skimage.feature import greycomatrix, greycoprops
 from skimage import io, color, img_as_ubyte
