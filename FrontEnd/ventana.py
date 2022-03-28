@@ -3,18 +3,14 @@ import tkinter
 from tkinter import *
 from tkinter import ttk
 from PIL import Image, ImageTk
-from django.forms import NullBooleanField
 import image_slicer
 import tempfile
-
 from pprint import pprint
-from matplotlib import image
-from matplotlib.pyplot import text
 import numpy as np
-from skimage import io, color, img_as_ubyte
+from skimage import io, img_as_ubyte
 from skimage.color import rgb2gray
 from skimage.feature import greycomatrix, greycoprops
-from sklearn.metrics.cluster import entropy
+
 ################LIBRERIAS################
 class Jack():
     def __init__(self) -> None:
@@ -84,6 +80,7 @@ class Jack():
             else:
                 c1 += 1
                 c2 = 1
+
     #Funcion que calcula la desviacion std de las imagenes apendiza los valores dentro del diccionario
     def desviacionRGB(self, directory:str, tiles:list, file:str):
         c1 = c2 = 1
@@ -191,9 +188,9 @@ class App():
     def __init__(self):
 
         self.muestra = []
-        self.interador = 4
-        self.file = "fire_000" + str(self.interador)
-        self.archv = "FrontEnd/" + self.file + ".jpg"
+        self.iterador = 1
+        self.file = "fire-00" + str(self.iterador)
+        self.archv = "FrontEnd/img/" + self.file + ".jpg"
         self.dir = ""
         self.tiles = image_slicer.slice(self.archv, 25, save=False)
         self.colores = "lightgray"
@@ -247,7 +244,7 @@ class App():
             #minifoto.jackPrint()
             self.muestra.append(minifoto)
             # LOOP PARA MANTENER ACCESO A LA CARPETA GENERADA TODO EL TIEMPO
-            self.arrayPrint()
+            #self.arrayPrint()
             self.window.mainloop()
 
     ############################## FUNCIONES DE BOTONES ##############################
@@ -258,9 +255,15 @@ class App():
     def siguiente(self):
         "Iterar Imagenes"
         def click ():
-            self.interador += 1
-            self.file = "fire_000" + str(self.interador)
-            self.archv = "FrontEnd/" + self.file + ".jpg"
+            self.iterador += 1
+            if self.iterador < 10:
+                self.file = "fire-00" + str(self.iterador)
+            elif self.iterador >= 10 and self.iterador < 100:
+                self.file = "fire-0" + str(self.iterador)
+            elif self.iterador > 100:
+                self.file = "fire-" + str(self.iterador)
+            
+            self.archv = "FrontEnd/img/" + self.file + ".jpg"
             self.tiles = image_slicer.slice(self.archv, 25, save=False)
             self.labelA =  ttk.Label(self.window, text=self.archv).place(x=80, y=20)
             self.labelmatrix = self.jackTheRipper(tmp=self.dir, tiles=self.tiles, file=self.file, window=self.window)
@@ -272,7 +275,7 @@ class App():
             #pprint(minifoto.directorio)
             #minifoto.jackPrint()
             self.muestra.append(minifoto)
-            self.arrayPrint()
+            #self.arrayPrint()
 
             # print(self.archv)
             # print(self.tiles)
