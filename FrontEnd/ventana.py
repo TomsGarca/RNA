@@ -1,7 +1,6 @@
 ################LIBRERIAS################
  ############## INTERFAZ ##############
 import os
-from re import A
 import tkinter
 from tkinter import *
 from tkinter import ttk
@@ -41,6 +40,11 @@ class Jack():
                 "correlation": []
             }
         }
+    def get(self, a, b):
+        aux = str(self.dicc[a][b])
+        aux2 = aux.split("[")[1]
+        aux3 = aux2.split("]")[0]
+        return aux3
 
     def jackPrint(self):
         pprint(self.dicc)
@@ -306,13 +310,16 @@ class App():
         analizar_btn = ttk.Button(self.window, text='Analizar', command=self.procesar())
         analizar_btn.place(x=600, y=235)
 
+        exportar_btn = ttk.Button(self.window, text='Exportar TXT', command=self.expTxt())
+        exportar_btn.place(x=600, y=283)
+
         with tempfile.TemporaryDirectory(dir="FrontEnd") as tmp:
             #Label para mostrar el nombre del archivo
             # Fragmentos de imagen guardados en la carpeta tmp
             
             self.dir = tmp
             self.labelmatrix = self.jackTheRipper(tiles=self.tiles, file=self.file, window=self.window)
-            pprint(self.dicc)
+            #pprint(self.dicc)
             self.window.mainloop()
 
     ############################## FUNCIONES DE BOTONES ##############################
@@ -329,6 +336,7 @@ class App():
             if path.is_file():
                 contador += 1
         return contador
+
     def siguiente(self):
         "Iterar Imagenes"
         def click ():
@@ -341,8 +349,10 @@ class App():
                 self.file = "fire-" + str(self.iterador)
             elif self.iterador >= self.lenDir():
                 self.file = "fire-" + str(self.lenDir())
-                analizar_btn = ttk.Button(self.window, text='Analizar', command=self.procesar())
-                analizar_btn.place(x=600, y=235)
+                # analizar_btn = ttk.Button(self.window, text='Analizar', command=self.procesar())
+                # analizar_btn.place(x=600, y=235)
+                # exportar_btn = ttk.Button(self.window, text='Exportar TXT', command=self.expTxt())
+                # exportar_btn.place(x=600, y=283)
             
             self.archv = "FrontEnd/img/" + self.file + ".jpg"
             self.tiles = image_slicer.slice(self.archv, 25, save=False)
@@ -388,13 +398,12 @@ class App():
                     img = str(label.image)
                     num = int(img.split("pyimage")[1])
                     self.dicc["imagenes"]["humo"].append(num)
-
-            pprint(self.dicc)
+            #ttk.Label(self.window, text="Guardado", background="lightgray"). place(x=420, y=200)
         return click
     
     def procesar(self):
         def click():
-            print("ANALIZANDO")
+            #print("ANALIZANDO")
             #print(f"tiles: {str(len(self.tiles))}")
             for i in self.dicc["imagenes"]:
                 if i == "incendio":
@@ -420,10 +429,75 @@ class App():
 
                         m = Jack()
                         m.mediaRGB(posicion=self.dicc["imagenes"]["humo"][j], directory=self.dir)
-                        m.desviacionRGB(posicion=self.dicc["imagenes"]["no_incendio"][j], directory=self.dir)
+                        m.desviacionRGB(posicion=self.dicc["imagenes"]["humo"][j], directory=self.dir)
                         m.descriptores(posicion=self.dicc["imagenes"]["humo"][j], directory=self.dir)
                         self.dicc["muestra"]["humo"].append(m)
-            self.arrayPrint()
+            #self.arrayPrint()
+        return click
+
+    def expTxt(self):
+        def click():
+            clase = ""
+            for i in self.dicc['muestra']:
+                if i == "incendio":
+                    clase = "fire"
+                    for j in range(len(self.dicc['muestra'][i])):
+                        linea = ""
+                        linea += str(self.dicc['muestra'][i][j].get("media", "mediaR")) + ","
+                        linea += str(self.dicc['muestra'][i][j].get("media", "mediaG")) + ","
+                        linea += str(self.dicc['muestra'][i][j].get("media", "mediaB")) + ","
+                        linea += str(self.dicc['muestra'][i][j].get("desv", "desv_R")) + ","
+                        linea += str(self.dicc['muestra'][i][j].get("desv", "desv_G")) + ","
+                        linea += str(self.dicc['muestra'][i][j].get("desv", "desv_B")) + ","
+                        linea += str(self.dicc['muestra'][i][j].get("med_textura", "energy")) + ","
+                        linea += str(self.dicc['muestra'][i][j].get("med_textura", "homogeneity")) + ","
+                        linea += str(self.dicc['muestra'][i][j].get("med_textura", "contrast")) + ","
+                        linea += str(self.dicc['muestra'][i][j].get("med_textura", "dissimilarity")) + ","
+                        linea += str(self.dicc['muestra'][i][j].get("med_textura", "correlation")) + ","
+                        linea += clase + "\n"
+                        f = open("muestra.txt", "a") # modo 'a' siempre agrega algo al final al archivo
+                        f.write(linea)
+                        f.close()
+
+                elif i == "no_incendio":
+                    clase = "no_fire"
+                    for j in range(len(self.dicc['muestra'][i])):
+                        linea = ""
+                        linea += str(self.dicc['muestra'][i][j].get("media", "mediaR")) + ","
+                        linea += str(self.dicc['muestra'][i][j].get("media", "mediaG")) + ","
+                        linea += str(self.dicc['muestra'][i][j].get("media", "mediaB")) + ","
+                        linea += str(self.dicc['muestra'][i][j].get("desv", "desv_R")) + ","
+                        linea += str(self.dicc['muestra'][i][j].get("desv", "desv_G")) + ","
+                        linea += str(self.dicc['muestra'][i][j].get("desv", "desv_B")) + ","
+                        linea += str(self.dicc['muestra'][i][j].get("med_textura", "energy")) + ","
+                        linea += str(self.dicc['muestra'][i][j].get("med_textura", "homogeneity")) + ","
+                        linea += str(self.dicc['muestra'][i][j].get("med_textura", "contrast")) + ","
+                        linea += str(self.dicc['muestra'][i][j].get("med_textura", "dissimilarity")) + ","
+                        linea += str(self.dicc['muestra'][i][j].get("med_textura", "correlation")) + ","
+                        linea += clase + "\n"
+                        f = open("muestra.txt", "a") # modo 'a' siempre agrega algo al final al archivo
+                        f.write(linea)
+                        f.close()
+
+                elif i == "humo":
+                    clase = "smoke"
+                    for j in range(len(self.dicc['muestra'][i])):
+                        linea = ""
+                        linea += str(self.dicc['muestra'][i][j].get("media", "mediaR")) + ","
+                        linea += str(self.dicc['muestra'][i][j].get("media", "mediaG")) + ","
+                        linea += str(self.dicc['muestra'][i][j].get("media", "mediaB")) + ","
+                        linea += str(self.dicc['muestra'][i][j].get("desv", "desv_R")) + ","
+                        linea += str(self.dicc['muestra'][i][j].get("desv", "desv_G")) + ","
+                        linea += str(self.dicc['muestra'][i][j].get("desv", "desv_B")) + ","
+                        linea += str(self.dicc['muestra'][i][j].get("med_textura", "energy")) + ","
+                        linea += str(self.dicc['muestra'][i][j].get("med_textura", "homogeneity")) + ","
+                        linea += str(self.dicc['muestra'][i][j].get("med_textura", "contrast")) + ","
+                        linea += str(self.dicc['muestra'][i][j].get("med_textura", "dissimilarity")) + ","
+                        linea += str(self.dicc['muestra'][i][j].get("med_textura", "correlation")) + ","
+                        linea += clase + "\n"
+                        f = open("muestra.txt", "a") # modo 'a' siempre agrega algo al final al archivo
+                        f.write(linea)
+                        f.close()
         return click
     ############################## FUNCIONES DE BOTONES ##############################
 
@@ -481,7 +555,7 @@ class App():
                 x += 65
 
         guardar_btn = ttk.Button(self.window, text='Guardar', command=self.guardar(label))
-        guardar_btn.place(x=600, y=283)
+        guardar_btn.place(x=600, y=200)
 
 ########### MAIN ############
 if __name__ == '__main__':
