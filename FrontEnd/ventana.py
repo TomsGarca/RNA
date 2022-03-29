@@ -1,31 +1,39 @@
 ################LIBRERIAS################
+ ############## INTERFAZ ##############
+import os
+from re import A
 import tkinter
 from tkinter import *
 from tkinter import ttk
+ ############## INTERFAZ ##############
+ ######### TRATAMIENTO DE IMG #########
 from PIL import Image, ImageTk
 import image_slicer
 import tempfile
-from pprint import pprint
-import numpy as np
 from skimage import io, img_as_ubyte
 from skimage.color import rgb2gray
 from skimage.feature import greycomatrix, greycoprops
-
+ ######### TRATAMIENTO DE IMG #########
+ ######## TRATAMIENTO DE DATOS ########
+import numpy as np
+from pprint import pprint
+import pathlib
+ ######## TRATAMIENTO DE DATOS ########
 ################LIBRERIAS################
 class Jack():
     def __init__(self) -> None:
-        self.directorio = {
-            "media": {
+        self.dicc = {
+            "media": { #coleccion de medias
                 "mediaR": [],
                 "mediaG": [],
-                "mediaB": [],
+                "mediaB": []
             },
-            "desv": {
+            "desv": { #coleccion de desviaciones
                 "desv_R": [],
                 "desv_G": [],
-                "desv_B": [],
+                "desv_B": []
             },
-            "med_textura": {
+            "med_textura": { #medidas de textura
                 "energy": [],
                 "homogeneity": [],
                 "contrast": [],
@@ -35,106 +43,145 @@ class Jack():
         }
 
     def jackPrint(self):
-        pprint(self.directorio)
+        pprint(self.dicc)
     #Funcion que calcula las medias RGB de las imagenes, apendiza los valores en el dicionario
-    def mediaRGB(self, directory:str, tiles:list, file:str):
-        """directory = Carpeta donde se guadan las imagenes.\n
-            tiles = Variable que contiene la imagen fragmentada.\n
-            file = Nombre del archivo original, sin extension."""
+    def mediaRGB(self, posicion, directory):
+        arch = "D:/GitHub_Rep/Mineria_de_Datos/" + directory
+        cont = 0
+        cont2 = 1
+        file = "fire-00" + str(cont2)
         c1 = c2 = 1
-        cmp = cmp2 = comp = ""
+        cmp = cmp2 = comp = comp2 = ""
         sumR = sumG = sumB = 0
+        with os.scandir(arch) as ficheros:
+            for fichero in ficheros:
+                cont += 1
 
-        for i in range(1, len(tiles)+1):
-            if c1 < 10:
-                cmp = "_0" + str(c1)
-            else:
-                cmp = "_" + str(c1)
+                if c1 < 10:
+                    cmp = "_0" + str(c1)
+                else:
+                    cmp = "_" + str(c1)
 
-            if c2 < 10:
-                cmp2 = "_0" + str(c2)
-            else:
-                cmp2 = "_" + str(c2)
+                if c2 < 10:
+                    cmp2 = "_0" + str(c2)
+                else:
+                    cmp2 = "_" + str(c2)
 
-            comp = cmp + cmp2
+                comp = cmp + cmp2
+                comp2 = directory + "/" + file + comp + ".png"
 
-            arch = directory + "/" + file + comp + ".png"
+                if posicion == cont:
+                    img = Image.open(comp2)
+                    pixel = img.load()
+                    j1,k1 = img.size
 
-            img = Image.open(arch)
-            pixel = img.load()
-            j1,k1 = img.size
+                    for j in range (j1):
+                        for k in range(k1):
+                            sumR += pixel[j,k][0]
+                            sumG += pixel[j,k][1]
+                            sumB += pixel[j,k][2]
 
-            for j in range (j1):
-                for k in range(k1):
-                    sumR += pixel[j,k][0]
-                    sumG += pixel[j,k][1]
-                    sumB += pixel[j,k][2]
+                    self.dicc["media"]["mediaR"].append(round(sumR/1800, 4))
+                    self.dicc["media"]["mediaG"].append(round(sumG/1800, 4))
+                    self.dicc["media"]["mediaB"].append(round(sumB/1800, 4))
+                    sumR = sumG = sumB = 0
 
-            self.directorio["media"]["mediaR"].append(round(sumR/1800, 4))
-            self.directorio["media"]["mediaG"].append(round(sumG/1800, 4))
-            self.directorio["media"]["mediaB"].append(round(sumB/1800, 4))
-            sumR = sumG = sumB = 0
 
-            if c2 < 5:
-                c2 += 1
-            else:
-                c1 += 1
-                c2 = 1
+                if cont%25 == 0 and cont > 0:
+                    cont2 += 1
+                    if cont2 < 10:
+                        file = "fire-00" + str(cont2)
+                        c1 = c2 = 1
+                    elif cont2 < 100:
+                        file = "fire-0" + str(cont2)
+                        c1 = c2 = 1
+                    elif cont2 < len(ficheros):
+                        file = "fire-" + str(cont2)
+                        c1 = c2 = 1
+                else:
+                    if c2 < 5:
+                        c2 += 1
+                    else:
+                        c1 += 1
+                        c2 = 1
 
     #Funcion que calcula la desviacion std de las imagenes apendiza los valores dentro del diccionario
-    def desviacionRGB(self, directory:str, tiles:list, file:str):
+    def desviacionRGB(self, posicion, directory):
+        arch = "D:/GitHub_Rep/Mineria_de_Datos/" + directory
+        cont = 0
+        cont2 = 1
+        file = "fire-00" + str(cont2)
         c1 = c2 = 1
-        cmp = cmp2 = comp = ""
+        cmp = cmp2 = comp = comp2 = ""
 
-        for i in range(1, len(tiles)+1):
-            if c1 < 10:
-                cmp = "_0" + str(c1)
-            else:
-                cmp = "_" + str(c1)
+        with os.scandir(arch) as ficheros:
+            for fichero in ficheros:
+                cont += 1
 
-            if c2 < 10:
-                cmp2 = "_0" + str(c2)
-            else:
-                cmp2 = "_" + str(c2)
+                if c1 < 10:
+                    cmp = "_0" + str(c1)
+                else:
+                    cmp = "_" + str(c1)
 
-            comp = cmp + cmp2
+                if c2 < 10:
+                    cmp2 = "_0" + str(c2)
+                else:
+                    cmp2 = "_" + str(c2)
 
-            arch = directory + "/" + file + comp + ".png"
+                comp = cmp + cmp2
+                comp2 = directory + "/" + file + comp + ".png"
 
-            img = Image.open(arch)
-            pixel = img.load()
-            j1,k1 = img.size
+                if posicion == cont:
+                    img = Image.open(comp2)
+                    pixel = img.load()
+                    j1,k1 = img.size
 
-            desvR = []
-            desvG = []
-            desvB = []
+                    desvR = []
+                    desvG = []
+                    desvB = []
 
-            for j in range (j1):
-                for k in range(k1):
-                    desvR.append(pixel[j,k][0])
-                    desvG.append(pixel[j,k][1])
-                    desvB.append(pixel[j,k][2])
+                    for j in range (j1):
+                        for k in range(k1):
+                            desvR.append(pixel[j,k][0])
+                            desvG.append(pixel[j,k][1])
+                            desvB.append(pixel[j,k][2])
 
-            r = []
-            g = []
-            b = []
-            r = np.array(desvR)
-            g = np.array(desvG)
-            b = np.array(desvB)
+                    r = []
+                    g = []
+                    b = []
+                    r = np.array(desvR)
+                    g = np.array(desvG)
+                    b = np.array(desvB)
+                    
+                    self.dicc["desv"]["desv_R"].append(round(np.std(r), 4))
+                    self.dicc["desv"]["desv_G"].append(round(np.std(g), 4))
+                    self.dicc["desv"]["desv_B"].append(round(np.std(b), 4))
 
-            self.directorio["desv"]["desv_R"].append(round(np.std(r), 4))
-            self.directorio["desv"]["desv_G"].append(round(np.std(g), 4))
-            self.directorio["desv"]["desv_B"].append(round(np.std(b), 4))
+                if cont%25 == 0 and cont > 0:
+                    cont2 += 1
+                    if cont2 < 10:
+                        file = "fire-00" + str(cont2)
+                        c1 = c2 = 1
+                    elif cont2 < 100:
+                        file = "fire-0" + str(cont2)
+                        c1 = c2 = 1
+                    elif cont2 < len(ficheros):
+                        file = "fire-" + str(cont2)
+                        c1 = c2 = 1
+                else:
+                    if c2 < 5:
+                        c2 += 1
+                    else:
+                        c1 += 1
+                        c2 = 1
 
-            if c2 < 5:
-                c2 += 1
-            else:
-                c1 += 1
-                c2 = 1
-
-    def descriptores(self, directory:str, tiles:list, file:str):
+    def descriptores(self, posicion, directory):
+        arch = "D:/GitHub_Rep/Mineria_de_Datos/" + directory
+        cont = 0
+        cont2 = 1
+        file = "fire-00" + str(cont2)
         c1 = c2 = 1
-        cmp = cmp2 = comp = "_01"
+        cmp = cmp2 = comp = comp2 = ""
         distances = [1]
         angles = [0]
         properties = ['energy', 'homogeneity' ,'contrast', 'dissimilarity', 'correlation']
@@ -142,57 +189,84 @@ class Jack():
         imgGray = []
         #arch = directory + "/" + file + comp + ".png"
 
-        for i in range(1, len(tiles)+1):
-            if c1 < 10:
-                cmp = "_0" + str(c1)
-            else:
-                cmp = "_" + str(c1)
+        with os.scandir(arch) as ficheros:
+            for fichero in ficheros:
+                cont += 1
 
-            if c2 < 10:
-                cmp2 = "_0" + str(c2)
-            else:
-                cmp2 = "_" + str(c2)
+                if c1 < 10:
+                    cmp = "_0" + str(c1)
+                else:
+                    cmp = "_" + str(c1)
 
-            comp = cmp + cmp2
+                if c2 < 10:
+                    cmp2 = "_0" + str(c2)
+                else:
+                    cmp2 = "_" + str(c2)
 
-            arch = directory + "/" + file + comp + ".png"
+                comp = cmp + cmp2
+                comp2 = directory + "/" + file + comp + ".png"
 
-            img = io.imread(arch)
-            imgG = img_as_ubyte(rgb2gray(img))
+                if posicion == cont:
+                    img = Image.open(comp2)
+                    imgG = img_as_ubyte(rgb2gray(img))
+                    inds = np.digitize(imgG, bins)
 
-            inds = np.digitize(imgG, bins)
-
-            max_value = inds.max()+1
-            glcm = greycomatrix(inds,
-                     distances=distances,
-                     angles=angles,
-                     levels = max_value,
-                     symmetric=True,
-                     normed=True)
-
-            self.directorio["med_textura"]["energy"].append(greycoprops(glcm, properties[0]))
-            self.directorio["med_textura"]["homogeneity"].append(greycoprops(glcm, properties[1]))
-            self.directorio["med_textura"]["contrast"].append(greycoprops(glcm, properties[2]))
-            self.directorio["med_textura"]["dissimilarity"].append(greycoprops(glcm, properties[3]))
-            self.directorio["med_textura"]["correlation"].append(greycoprops(glcm, properties[4]))
+                    max_value = inds.max()+1
+                    glcm = greycomatrix(inds,
+                        distances=distances,
+                        angles=angles,
+                        levels = max_value,
+                        symmetric=True,
+                        normed=True)
 
 
-            if c2 < 5:
-                c2 += 1
-            else:
-                c1 += 1
-                c2 = 1
+                    self.dicc["med_textura"]["energy"].append(round(greycoprops(glcm, properties[0])[0][0], 4))
+                    self.dicc["med_textura"]["homogeneity"].append(round(greycoprops(glcm, properties[1])[0][0], 4))
+                    self.dicc["med_textura"]["contrast"].append(round(greycoprops(glcm, properties[2])[0][0], 4))
+                    self.dicc["med_textura"]["dissimilarity"].append(round(greycoprops(glcm, properties[3])[0][0], 4))
+                    self.dicc["med_textura"]["correlation"].append(round(greycoprops(glcm, properties[4])[0][0], 4))
 
+                if cont%25 == 0 and cont > 0:
+                    cont2 += 1
+                    if cont2 < 10:
+                        file = "fire-00" + str(cont2)
+                        c1 = c2 = 1
+                    elif cont2 < 100:
+                        file = "fire-0" + str(cont2)
+                        c1 = c2 = 1
+                    elif cont2 < len(ficheros):
+                        file = "fire-" + str(cont2)
+                        c1 = c2 = 1
+                else:
+                    if c2 < 5:
+                        c2 += 1
+                    else:
+                        c1 += 1
+                        c2 = 1
 
 class App():
     def __init__(self):
 
-        self.muestra = []
+        self.dicc = {
+            "muestra": { #GUARDA JACKS
+                "incendio": [],
+                "no_incendio": [],
+                "humo": []
+            },
+            "imagenes": { #GUARDA NUM DE MINIFOTO
+                "incendio": [],
+                "no_incendio": [],
+                "humo": []
+            }
+        }
+
         self.iterador = 1
         self.file = "fire-00" + str(self.iterador)
+        #self.file = "fire-300"
         self.archv = "FrontEnd/img/" + self.file + ".jpg"
         self.dir = ""
         self.tiles = image_slicer.slice(self.archv, 25, save=False)
+        self.coloresD = "lightgray"
         self.colores = "lightgray"
         self.labelmatrix = ""
 
@@ -229,29 +303,32 @@ class App():
         nulo_btn = ttk.Button(self.window, text='Null', command=self.colorpick("lightgray"))
         nulo_btn.place(x=600, y=160)
 
+        analizar_btn = ttk.Button(self.window, text='Analizar', command=self.procesar())
+        analizar_btn.place(x=600, y=235)
 
         with tempfile.TemporaryDirectory(dir="FrontEnd") as tmp:
             #Label para mostrar el nombre del archivo
             # Fragmentos de imagen guardados en la carpeta tmp
             
-            self.labelmatrix = self.jackTheRipper(tmp=tmp, tiles=self.tiles, file=self.file, window=self.window)
             self.dir = tmp
-            minifoto = Jack()
-            minifoto.mediaRGB(directory=tmp, tiles=self.tiles, file=self.file)
-            minifoto.desviacionRGB(directory=tmp, tiles=self.tiles, file=self.file)
-            minifoto.descriptores(directory=tmp, tiles=self.tiles, file=self.file)
-            #pprint(minifoto.directorio)
-            #minifoto.jackPrint()
-            self.muestra.append(minifoto)
-            # LOOP PARA MANTENER ACCESO A LA CARPETA GENERADA TODO EL TIEMPO
-            #self.arrayPrint()
+            self.labelmatrix = self.jackTheRipper(tiles=self.tiles, file=self.file, window=self.window)
+            pprint(self.dicc)
             self.window.mainloop()
 
     ############################## FUNCIONES DE BOTONES ##############################
     def arrayPrint(self):
-        for i in range(0, len(self.muestra)):
-            self.muestra[i].jackPrint()
-    
+        for i in self.dicc["muestra"]:
+            print(f"{str(i).upper()}\n")
+            for j in range(len(self.dicc["muestra"][i])):
+                self.dicc["muestra"][i][j].jackPrint()
+                print("\n")
+
+    def lenDir(self):
+        contador = 0
+        for path in pathlib.Path("FrontEnd/img").iterdir():
+            if path.is_file():
+                contador += 1
+        return contador
     def siguiente(self):
         "Iterar Imagenes"
         def click ():
@@ -260,26 +337,20 @@ class App():
                 self.file = "fire-00" + str(self.iterador)
             elif self.iterador >= 10 and self.iterador < 100:
                 self.file = "fire-0" + str(self.iterador)
-            elif self.iterador > 100:
+            elif self.iterador > 100 and self.iterador < self.lenDir():
                 self.file = "fire-" + str(self.iterador)
+            elif self.iterador >= self.lenDir():
+                self.file = "fire-" + str(self.lenDir())
+                analizar_btn = ttk.Button(self.window, text='Analizar', command=self.procesar())
+                analizar_btn.place(x=600, y=235)
             
             self.archv = "FrontEnd/img/" + self.file + ".jpg"
             self.tiles = image_slicer.slice(self.archv, 25, save=False)
             self.labelA =  ttk.Label(self.window, text=self.archv).place(x=80, y=20)
-            self.labelmatrix = self.jackTheRipper(tmp=self.dir, tiles=self.tiles, file=self.file, window=self.window)
-
-            minifoto = Jack()
-            minifoto.mediaRGB(directory=self.dir, tiles=self.tiles, file=self.file)
-            minifoto.desviacionRGB(directory=self.dir, tiles=self.tiles, file=self.file)
-            minifoto.descriptores(directory=self.dir, tiles=self.tiles, file=self.file)
-            #pprint(minifoto.directorio)
-            #minifoto.jackPrint()
-            self.muestra.append(minifoto)
-            #self.arrayPrint()
-
-            # print(self.archv)
-            # print(self.tiles)
+            self.labelmatrix = self.jackTheRipper(tiles=self.tiles, file=self.file, window=self.window)
+            #pprint(self.dicc)
         return click
+
     def colorpick(self, c):
         "Colores a elegir para seleccion de imagen"
         def click ():
@@ -293,14 +364,74 @@ class App():
             #amigo aqui colores no esta definido
             label.config(bg=(self.colores))
         return click
+
+    def guardar(self, label_list:list):
+        def click ():
+            for i in range (0, len(label_list)):
+                if label_list[i]["background"] == "orange":
+
+                    label = label_list[i]
+                    img = str(label.image)
+                    num = int(img.split("pyimage")[1])
+                    self.dicc["imagenes"]["incendio"].append(num)
+
+                elif label_list[i]["background"] == "green":
+                    
+                    label = label_list[i]
+                    img = str(label.image)
+                    num = int(img.split("pyimage")[1])
+                    self.dicc["imagenes"]["no_incendio"].append(num)
+
+                elif label_list[i]["background"] == "blue":
+                    
+                    label = label_list[i]
+                    img = str(label.image)
+                    num = int(img.split("pyimage")[1])
+                    self.dicc["imagenes"]["humo"].append(num)
+
+            pprint(self.dicc)
+        return click
+    
+    def procesar(self):
+        def click():
+            print("ANALIZANDO")
+            #print(f"tiles: {str(len(self.tiles))}")
+            for i in self.dicc["imagenes"]:
+                if i == "incendio":
+                    for j in range(len(self.dicc["imagenes"]["incendio"])):
+
+                        m = Jack()
+                        m.mediaRGB(posicion=self.dicc["imagenes"]["incendio"][j], directory=self.dir)
+                        m.desviacionRGB(posicion=self.dicc["imagenes"]["incendio"][j], directory=self.dir)
+                        m.descriptores(posicion=self.dicc["imagenes"]["incendio"][j], directory=self.dir)
+                        self.dicc["muestra"]["incendio"].append(m)
+
+                elif i == "no_incendio":
+                    for j in range(len(self.dicc["imagenes"]["no_incendio"])):
+
+                        m = Jack()
+                        m.mediaRGB(posicion=self.dicc["imagenes"]["no_incendio"][j], directory=self.dir)
+                        m.desviacionRGB(posicion=self.dicc["imagenes"]["no_incendio"][j], directory=self.dir)
+                        m.descriptores(posicion=self.dicc["imagenes"]["no_incendio"][j], directory=self.dir)
+                        self.dicc["muestra"]["no_incendio"].append(m)
+
+                elif i == "humo":
+                    for j in range(len(self.dicc["imagenes"]["humo"])):
+
+                        m = Jack()
+                        m.mediaRGB(posicion=self.dicc["imagenes"]["humo"][j], directory=self.dir)
+                        m.desviacionRGB(posicion=self.dicc["imagenes"]["no_incendio"][j], directory=self.dir)
+                        m.descriptores(posicion=self.dicc["imagenes"]["humo"][j], directory=self.dir)
+                        self.dicc["muestra"]["humo"].append(m)
+            self.arrayPrint()
+        return click
     ############################## FUNCIONES DE BOTONES ##############################
 
-    def jackTheRipper(self, tmp:str, tiles:list, file:str, window):
-        """tmp = Carpeta donde se guadan las imagenes.\n
-            tiles = Variable que contiene la imagen fragmentada.\n
+    def jackTheRipper(self, tiles:list, file:str, window):
+        """ tiles = Variable que contiene la imagen fragmentada.\n
             file = Nombre del archivo original, sin extension.\n
             window = Interfaz que pertenece"""
-        image_slicer.save_tiles(tiles, directory=tmp, prefix=file)
+        image_slicer.save_tiles(tiles, directory=self.dir, prefix=file)
 
         #Inicializacion de Variables para iraciones.
         c1 = c2 = 1
@@ -323,14 +454,14 @@ class App():
 
             comp = cmp + cmp2
 
-            arch = tmp + "/" + file + comp + ".png"
+            arch = self.dir + "/" + file + comp + ".png"
 
             #Creacion de Label
             img = Image.open(arch)
             pic = ImageTk.PhotoImage(img)
             label.append(tkinter.Label(window, image=pic, borderwidth=4))
             label[i-1].image = pic
-            label[i-1].config(bg=(self.colores))
+            label[i-1].config(bg=(self.coloresD))
 
             label[i-1].bind("<Button-1>", self.clicked(label=label[i-1]))
 
@@ -348,6 +479,9 @@ class App():
                 y += 50
             else:
                 x += 65
+
+        guardar_btn = ttk.Button(self.window, text='Guardar', command=self.guardar(label))
+        guardar_btn.place(x=600, y=283)
 
 ########### MAIN ############
 if __name__ == '__main__':
