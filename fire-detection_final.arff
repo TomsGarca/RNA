@@ -4,12 +4,12 @@
 %	 This data is about texture and distribution of colors in images from 
 %	 fire in coniferous forest taken in day.
 %
-%      This data set includes WRITE-NUMBER!!! instances of the class "fire" 
-%      and WRITE-NUMBER!!! instances of "nofire" class, and WRITE-NUMBER!!! instances of "smoke" class 
+%      This data set includes 1397 instances of the class "fire" 
+%      and 1397 instances of "nofire" class, and 1560 instances of "smoke" class 
 %      The instances are described by 12 attributes.
 %  
 % 
-% 3. Number of Instances: WRITE NUMBER!!!!!!!
+% 3. Number of Instances: 4354
 % 
 % 4. Number of Attributes: 11  + the class attribute
 % 
@@ -32,9 +32,9 @@
 % 7. Class Distribution: (class value 0 as "no_fire", 1 is interpreted as "fire"
 %    and value 2 as "smoke" )
 %    Class Value  Number of instances
-%    0            
-%    1            
-%    2
+%    0             1397
+%    1             1397
+%    2             1560
 %
 @relation fire-detection 
 @attribute meanr numeric
