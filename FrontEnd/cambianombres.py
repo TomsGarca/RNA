@@ -25,7 +25,8 @@ for f in os.listdir():
     #num = num.replace('.','')
     #print(num)
     #count = count + 1
-    nuevo_archivo = f"{fire}-{comp}{extension}"
+    fire = "fire"
+    nuevo_archivo = f"{fire}-{comp}.jpg"
     #print(nuevo_archivo)
     print(nuevo_archivo)
     os.rename(f,nuevo_archivo)

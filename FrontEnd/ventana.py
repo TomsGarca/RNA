@@ -19,6 +19,8 @@ from pprint import pprint
 import pathlib
  ######## TRATAMIENTO DE DATOS ########
 ################LIBRERIAS################
+
+#######################CODIGO#######################
 class Jack():
     def __init__(self) -> None:
         self.dicc = {
@@ -40,14 +42,17 @@ class Jack():
                 "correlation": []
             }
         }
+    #Regresa valor de un arreglo de un diccionario en formato string (a=medida, b=atributo)
     def get(self, a, b):
         aux = str(self.dicc[a][b])
         aux2 = aux.split("[")[1]
         aux3 = aux2.split("]")[0]
         return aux3
 
-    def jackPrint(self):
+    #Imprime lista del objeto de Jack
+    def jackPrint(self): 
         pprint(self.dicc)
+    
     #Funcion que calcula las medias RGB de las imagenes, apendiza los valores en el dicionario
     def mediaRGB(self, posicion, directory):
         arch = "D:/GitHub_Rep/Mineria_de_Datos/" + directory
@@ -179,6 +184,7 @@ class Jack():
                         c1 += 1
                         c2 = 1
 
+    #Funcion que calcula los descriptores de las imagenes apendiza los valores dentro del diccionario
     def descriptores(self, posicion, directory):
         arch = "D:/GitHub_Rep/Mineria_de_Datos/" + directory
         cont = 0
@@ -248,16 +254,19 @@ class Jack():
                         c1 += 1
                         c2 = 1
 
+ ############## INTERFAZ ##############
+#Clase de interfaz de usuario
 class App():
+    #Invocador de la clase,
     def __init__(self):
-
+        #Diccionario que guarda las minimagenes dependiendo que tipo sean (incendio, no_incendio o humo)
         self.dicc = {
-            "muestra": { #GUARDA JACKS
+            "muestra": { #GUARDA OBJETOS DE LA CLASE JACK
                 "incendio": [],
                 "no_incendio": [],
                 "humo": []
             },
-            "imagenes": { #GUARDA NUM DE MINIFOTO
+            "imagenes": { #GUARDA NUM DE MINIFOTO POR CLASE
                 "incendio": [],
                 "no_incendio": [],
                 "humo": []
@@ -269,53 +278,58 @@ class App():
         #self.file = "fire-300"
         self.archv = "FrontEnd/img/" + self.file + ".jpg"
         self.dir = ""
+        
+        #Parte donde la imagen se divide en 25 minimagenes y se guarda en tiles
         self.tiles = image_slicer.slice(self.archv, 25, save=False)
         self.coloresD = "lightgray"
         self.colores = "lightgray"
         self.labelmatrix = ""
 
-        ################Declare the Window#####################
+        ################Declaracion de la Ventana#####################
         self.window = Tk()
         self.window.geometry('720x360')
         self.window.title("Jack The Ripper")
         self.window.config(bg="lightgray")
-        ################Declare the Window#####################
 
-        # print(self.archv)
+        
+        #Declaracion del Label que muestra el nombre del archivo
         ttk.Label(self.window, text="Archivo: ", background="lightgray").place(x=30, y=20)
         self.labelA = ttk.Label(self.window, text=self.archv).place(x=80, y=20)
         ttk.Label(self.window, text="Color: ", background="lightgray"). place(x=420, y=100)
         self.color = ttk.Label(self.window, text="            ", background=self.colores).place(x=460, y=100)
         
-            #Definimos el boton de siguiente
+        #Declaracion del boton de Siguiente
         siguiente_btn = ttk.Button(self.window, text='Siguiente', command=self.siguiente())
         siguiente_btn.place(x=600, y=20)
 
-            #Boton Incendio
+        #Declaracion del boton de Incendio
         incendio_btn = ttk.Button(self.window, text='Inciendo', command=self.colorpick("orange"))
         incendio_btn.place(x=600, y=70)
 
-            #Boton No Incendio
+        #Declaracion del boton de Siguiente
         noincendio_btn = ttk.Button(self.window, text='No Incendio', command=self.colorpick("green"))
         noincendio_btn.place(x=600, y=100)
 
-            #Boton Humo
+        #Declaracion del boton de Humo
         humo_btn = ttk.Button(self.window, text='Humo', command=self.colorpick("blue"))
         humo_btn.place(x=600, y=130)
 
-            #boton nulo
+        #Declaracion del boton de Nulo
         nulo_btn = ttk.Button(self.window, text='Null', command=self.colorpick("lightgray"))
         nulo_btn.place(x=600, y=160)
 
+        #Declaracion del boton de Analizar
         analizar_btn = ttk.Button(self.window, text='Analizar', command=self.procesar())
         analizar_btn.place(x=600, y=235)
-
+        
+        #Declaracion del boton de Exportar a TXT
         exportar_btn = ttk.Button(self.window, text='Exportar TXT', command=self.expTxt())
         exportar_btn.place(x=600, y=283)
 
+        # CREACION DE UNA CARPETA TEMPORAL, PARA ALMACENAR LAS MINI IMAGENES
         with tempfile.TemporaryDirectory(dir="FrontEnd") as tmp:
-            #Label para mostrar el nombre del archivo
-            # Fragmentos de imagen guardados en la carpeta tmp
+           
+            #Fragmentos de imagen guardados en la carpeta tmp
             
             self.dir = tmp
             self.labelmatrix = self.jackTheRipper(tiles=self.tiles, file=self.file, window=self.window)
@@ -323,6 +337,7 @@ class App():
             self.window.mainloop()
 
     ############################## FUNCIONES DE BOTONES ##############################
+    #IMPRESION DEL DICCIONARIO
     def arrayPrint(self):
         for i in self.dicc["muestra"]:
             print(f"{str(i).upper()}\n")
@@ -330,6 +345,7 @@ class App():
                 self.dicc["muestra"][i][j].jackPrint()
                 print("\n")
 
+    # TAMAÑO DE ARREGLO
     def lenDir(self):
         contador = 0
         for path in pathlib.Path("FrontEnd/img").iterdir():
@@ -337,6 +353,7 @@ class App():
                 contador += 1
         return contador
 
+    # BOTON PARA RECORRER LAS IMAGENES
     def siguiente(self):
         "Iterar Imagenes"
         def click ():
@@ -349,10 +366,6 @@ class App():
                 self.file = "fire-" + str(self.iterador)
             elif self.iterador >= self.lenDir():
                 self.file = "fire-" + str(self.lenDir())
-                # analizar_btn = ttk.Button(self.window, text='Analizar', command=self.procesar())
-                # analizar_btn.place(x=600, y=235)
-                # exportar_btn = ttk.Button(self.window, text='Exportar TXT', command=self.expTxt())
-                # exportar_btn.place(x=600, y=283)
             
             self.archv = "FrontEnd/img/" + self.file + ".jpg"
             self.tiles = image_slicer.slice(self.archv, 25, save=False)
@@ -361,6 +374,7 @@ class App():
             #pprint(self.dicc)
         return click
 
+    # SELECCION DE CLASE POR COLORES
     def colorpick(self, c):
         "Colores a elegir para seleccion de imagen"
         def click ():
@@ -369,12 +383,13 @@ class App():
             #print (self.colores)
         return click
 
+    #REACCION DE LABEL AL CLICK
     def clicked(self, label):
         def click(e):
-            #amigo aqui colores no esta definido
             label.config(bg=(self.colores))
         return click
 
+    #ALMACENA IMAGENES POR CLASE
     def guardar(self, label_list:list):
         def click ():
             for i in range (0, len(label_list)):
@@ -401,6 +416,7 @@ class App():
             #ttk.Label(self.window, text="Guardado", background="lightgray"). place(x=420, y=200)
         return click
     
+    #PROCESA LAS IMAGENES GUARDADAS
     def procesar(self):
         def click():
             #print("ANALIZANDO")
@@ -435,6 +451,7 @@ class App():
             #self.arrayPrint()
         return click
 
+    #EXPORTA EL ANALIZIS UN CONTENIDO EN FORMATO .ARFF EN UN ARCHIVO .TXT
     def expTxt(self):
         def click():
             clase = ""
@@ -530,7 +547,7 @@ class App():
 
             arch = self.dir + "/" + file + comp + ".png"
 
-            #Creacion de Label
+            #Creacion de Labels
             img = Image.open(arch)
             pic = ImageTk.PhotoImage(img)
             label.append(tkinter.Label(window, image=pic, borderwidth=4))
@@ -556,9 +573,12 @@ class App():
 
         guardar_btn = ttk.Button(self.window, text='Guardar', command=self.guardar(label))
         guardar_btn.place(x=600, y=200)
+ ############## INTERFAZ ##############
 
 ########### MAIN ############
 if __name__ == '__main__':
     App()
     #pprint(app.Jack)
 ########### MAIN ############
+
+#######################CODIGO#######################
